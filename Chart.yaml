@@ -1,0 +1,25 @@
+apiVersion: v2
+name: tazama
+description: A unified Helm chart for deploying the Tazama Open-Source Transaction Monitoring, Core Services, and Rules engine stack on Kubernetes.
+
+# This denotes that the chart is an application rather than a reusable library component.
+type: application
+
+# This is the internal version of your Helm chart package itself. 
+# Increment this whenever you make architectural layout changes to your templates.
+version: 1.0.0
+
+# This represents the default version of the actual Tazama application suite being deployed.
+# It pairs with the global.tazamaVersion toggle inside your values.yaml.
+appVersion: "1.0.0"
+
+keywords:
+  - tazama
+  - transaction-monitoring
+  - anti-fraud
+  - financial-compliance
+  - cloud-native
+
+maintainers:
+  - name: Dom Cimafranca
+    email: domu@cimafranca.com

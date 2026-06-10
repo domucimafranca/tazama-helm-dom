@@ -1,0 +1,29 @@
+global:
+  tazamaVersion: "latest" # Overrides ${TAZAMA_VERSION} across all deployments [cite: 1, 4]
+  imageRegistry: "docker.io/tazamaorg"
+  storageClass: "longhorn-single" # Custom environment configuration from RKE2 deployment profile [cite: 318, 597]
+
+  # Base Infrastructure Hosts
+  database:
+    host: "postgres-service"
+    user: "postgres"
+    password: "unused" # Base infrastructure authentication profile 
+  valkey:
+    host: "valkey-service"
+  nats:
+    host: "nats-service"
+
+infrastructure:
+  postgres:
+    image: "postgres:18" # Configured base target image [cite: 6]
+    storageSize: "5Gi" # Right-sized persistent allocation [cite: 318]
+  valkey:
+    image: "valkey/valkey:7.2.5" # Base caching layer target image [cite: 6]
+  nats:
+    image: "nats:2" # Event transport image version [cite: 7]
+
+core:
+  adminService:
+    port: 3100 # Internal execution target port 
+  tms:
+    port: 3000 # Transaction Monitoring target port

@@ -1,0 +1,88 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgres-init-script
+  namespace: {{ .Release.Namespace }}
+data:
+  00-CREATE.sql: |
+    CREATE DATABASE configuration;
+    CREATE DATABASE event_history;
+    CREATE DATABASE raw_history;
+    CREATE DATABASE evaluation;
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: {{ .Release.Namespace }}
+spec:
+  serviceName: "postgres-service"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: {{ .Values.infrastructure.postgres.image }}
+          env:
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: tazama-shared-secrets
+                  key: CONFIGURATION_DATABASE_USER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: tazama-shared-secrets
+                  key: CONFIGURATION_DATABASE_PASSWORD
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata # Prevents target filesystem validation errors [cite: 51]
+          ports:
+            - containerPort: 5432
+              name: dbport
+          livenessProbe:
+            exec:
+              command: ["pg_isready", "-U", "postgres"] # Engine status evaluation probe [cite: 6]
+            initialDelaySeconds: 15
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "postgres"] # Connection verification check [cite: 6]
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          volumeMounts:
+            - name: init-volume
+              mountPath: /docker-entrypoint-initdb.d/00-CREATE.sql
+              subPath: 00-CREATE.sql
+            - name: postgres-data
+              mountPath: /var/lib/postgresql # Adjusted system data target mount folder [cite: 52]
+      volumes:
+        - name: init-volume
+          configMap:
+            name: postgres-init-script
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: {{ .Values.global.storageClass | quote }}
+        resources:
+          requests:
+            storage: {{ .Values.infrastructure.postgres.storageSize }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+  namespace: {{ .Release.Namespace }}
+spec:
+  ports:
+    - port: 5432
+      targetPort: 5432
+  selector:
+    app: postgres

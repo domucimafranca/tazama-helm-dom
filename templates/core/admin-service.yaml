@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: admin-service
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: admin-service
+  template:
+    metadata:
+      labels:
+        app: admin-service
+    spec:
+      initContainers:
+        - name: wait-db
+          image: busybox:1.36
+          command: ['sh', '-c', 'until nc -z {{ .Values.global.database.host }} 5432; do sleep 2; done;']
+        - name: wait-valkey
+          image: busybox:1.36
+          command: ['sh', '-c', 'until nc -z {{ .Values.global.valkey.host }} 6379; do sleep 2; done;']
+      containers:
+        - name: admin-service
+          image: "{{ .Values.global.imageRegistry }}/admin-service:{{ .Values.global.tazamaVersion }}"
+          envFrom:
+            - secretRef:
+                name: tazama-shared-secrets
+            - configMapRef:
+                name: tazama-core-config
+          ports:
+            - containerPort: 3100
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: admin-service
+  namespace: {{ .Release.Namespace }}
+spec:
+  ports:
+    - port: {{ .Values.core.adminService.port }}
+      targetPort: 3100
+  selector:
+    app: admin-service
