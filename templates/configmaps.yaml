@@ -4,7 +4,20 @@ metadata:
   name: tazama-core-config
   namespace: {{ .Release.Namespace }}
 data:
-  NODE_ENV: "dev" # Default environment classification 
-  LOG_LEVEL: "info" # System logging visibility constraint [cite: 23, 25, 27]
-  VALKEY_SERVERS: '[{"host":"valkey", "port":6379}]' # Runtime backend endpoints 
-  NATS_SERVER_URL: "nats://nats:4222" # Global cluster messaging router [cite: 21, 23, 25]
+  NODE_ENV: "dev"
+  LOG_LEVEL: "info"
+
+  # Stream Router Configurations
+  SERVER_URL: "nats:4222"
+  
+  # Cache Tier Configurations
+  REDIS_SERVERS: '[{"host":"valkey", "port":6379}]'
+
+  # Global Database Host Specifications 
+  CONFIGURATION_DATABASE_HOST: "postgres"
+  EVENT_HISTORY_DATABASE_HOST: "postgres"
+  RAW_HISTORY_DATABASE_HOST: "postgres"
+  EVALUATION_DATABASE_HOST: "postgres"
+
+  # Required NATS Stream Routing Keys
+  INTERDICTION_PRODUCER: "interdiction"
