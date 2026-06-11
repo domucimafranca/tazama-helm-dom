@@ -239,6 +239,17 @@ spec:
       labels:
         app: postgres
     spec:
+    # AFFINITY BLOCK TO RESOLVE SPECIFIC ISSUE
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: node-role.kubernetes.io/control-plane
+                    operator: DoesNotExist
+                  - key: node-role.kubernetes.io/master
+                    operator: DoesNotExist
+    # END OF AFFINITY BLOCK
       containers:
         - name: postgres
           image: "{{ .Values.infrastructure.postgres.image }}"
