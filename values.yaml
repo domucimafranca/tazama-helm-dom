@@ -5,13 +5,13 @@ global:
 
   # Base Infrastructure Hosts
   database:
-    host: "postgres-service"
+    host: "postgres"
     user: "postgres"
     password: "unused" # Base infrastructure authentication profile 
   valkey:
-    host: "valkey-service"
+    host: "valkey"
   nats:
-    host: "nats-service"
+    host: "nats"
 
 infrastructure:
   postgres:
