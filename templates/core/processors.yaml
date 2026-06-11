@@ -21,17 +21,67 @@ spec:
     spec:
       initContainers:
         - name: wait-db
-          image: busybox:1.36
-          command: ['sh', '-c', 'until nc -z {{ $.Values.global.database.host }} 5432; do sleep 2; done;']
+          image: "postgres:16"
+          env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: tazama-shared-secrets
+                  key: CONFIGURATION_DATABASE_PASSWORD
+          command:
+            - sh
+            - -c
+            - |
+              until psql -h postgres -U postgres -d raw_history -c "SELECT 'pain013'::regclass;" >/dev/null 2>&1; do
+                echo "Waiting for the full Tazama database schema to finish initializing..."
+                sleep 2
+              done
         - name: wait-valkey
           image: busybox:1.36
-          command: ['sh', '-c', 'until nc -z {{ $.Values.global.valkey.host }} 6379; do sleep 2; done;']
+          command: ['sh', '-c', 'until nc -z valkey 6379; do sleep 2; done;']
         - name: wait-nats
           image: busybox:1.36
-          command: ['sh', '-c', 'until nc -z {{ $.Values.global.nats.host }} 4222; do sleep 2; done;']
+          command: ['sh', '-c', 'until nc -z nats 4222; do sleep 2; done;']
       containers:
         - name: {{ $shortName }}
           image: "{{ $.Values.global.imageRegistry }}/{{ $processor }}:{{ $.Values.global.tazamaVersion }}"
+          env:
+            - name: STARTUP_TYPE
+              value: "nats" 
+            {{- if eq $shortName "ed" }}
+            - name: FUNCTION_NAME
+              value: "event-director" 
+            - name: CONSUMER_STREAM
+              value: "event-director"
+            - name: CONFIGURATION_DATABASE
+              value: "configuration"
+            {{- end }}
+            {{- if eq $shortName "tp" }}
+            - name: FUNCTION_NAME
+              value: "typology-processor"
+            - name: CONFIGURATION_DATABASE
+              value: "configuration" 
+            {{- end }}
+            {{- if eq $shortName "tadp" }}
+            - name: FUNCTION_NAME
+              value: "transaction-aggregation-decisioning-processor" 
+            - name: CONFIGURATION_DATABASE
+              value: "configuration" 
+            - name: RAW_HISTORY_DATABASE
+              value: "raw_history"
+            - name: EVALUATION_DATABASE
+              value: "evaluation"
+            {{- end }}
+            {{- if eq $shortName "ef" }}
+            - name: FUNCTION_NAME
+              value: "event-flow-rule-processor"
+            - name: RULE_NAME
+              value: "EFRuP" 
+            - name: RULE_VERSION
+              value: "1.0.0" 
+            - name: CONFIGURATION_DATABASE
+              value: "configuration" 
+            {{- end }}
           envFrom:
             - secretRef:
                 name: tazama-shared-secrets

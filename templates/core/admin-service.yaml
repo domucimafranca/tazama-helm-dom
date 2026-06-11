@@ -15,14 +15,38 @@ spec:
     spec:
       initContainers:
         - name: wait-db
-          image: busybox:1.36
-          command: ['sh', '-c', 'until nc -z {{ .Values.global.database.host }} 5432; do sleep 2; done;']
+          image: "postgres:16"
+          env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: tazama-shared-secrets
+                  key: CONFIGURATION_DATABASE_PASSWORD
+          command:
+            - sh
+            - -c
+            - |
+              until psql -h postgres -U postgres -d raw_history -c "SELECT 'pain013'::regclass;" >/dev/null 2>&1; do
+                echo "Waiting for the full Tazama database schema to finish initializing..."
+                sleep 2
+              done
         - name: wait-valkey
           image: busybox:1.36
-          command: ['sh', '-c', 'until nc -z {{ .Values.global.valkey.host }} 6379; do sleep 2; done;']
+          command: ['sh', '-c', 'until nc -z valkey 6379; do sleep 2; done;']
       containers:
         - name: admin-service
           image: "{{ .Values.global.imageRegistry }}/admin-service:{{ .Values.global.tazamaVersion }}"
+          env:
+            - name: FUNCTION_NAME
+              value: "admin-service"
+            - name: PORT
+              value: "3100"
+            - name: CONFIGURATION_DATABASE
+              value: "configuration"
+            - name: EVENT_HISTORY_DATABASE
+              value: "event_history"
+            - name: EVALUATION_DATABASE
+              value: "evaluation"
           envFrom:
             - secretRef:
                 name: tazama-shared-secrets

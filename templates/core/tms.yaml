@@ -15,17 +15,43 @@ spec:
     spec:
       initContainers:
         - name: wait-db
-          image: busybox:1.36
-          command: ['sh', '-c', 'until nc -z {{ .Values.global.database.host }} 5432; do sleep 2; done;']
+          image: "postgres:16"
+          env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: tazama-shared-secrets
+                  key: CONFIGURATION_DATABASE_PASSWORD
+          command:
+            - sh
+            - -c
+            - |
+              until psql -h postgres -U postgres -d raw_history -c "SELECT 'pain013'::regclass;" >/dev/null 2>&1; do
+                echo "Waiting for the full Tazama database schema to finish initializing..."
+                sleep 2
+              done
         - name: wait-valkey
           image: busybox:1.36
-          command: ['sh', '-c', 'until nc -z {{ .Values.global.valkey.host }} 6379; do sleep 2; done;']
+          command: ['sh', '-c', 'until nc -z valkey 6379; do sleep 2; done;']
         - name: wait-nats
           image: busybox:1.36
-          command: ['sh', '-c', 'until nc -z {{ .Values.global.nats.host }} 4222; do sleep 2; done;']
+          command: ['sh', '-c', 'until nc -z nats 4222; do sleep 2; done;']
       containers:
         - name: tms
           image: "{{ .Values.global.imageRegistry }}/tms-service:{{ .Values.global.tazamaVersion }}"
+          env:
+            - name: FUNCTION_NAME
+              value: "transaction-monitoring-service" 
+            - name: PORT
+              value: "3000" 
+            - name: STARTUP_TYPE
+              value: "nats" 
+            - name: PRODUCER_STREAM
+              value: "event-director" 
+            - name: RAW_HISTORY_DATABASE
+              value: "raw_history" 
+            - name: EVENT_HISTORY_DATABASE
+              value: "event_history" 
           envFrom:
             - secretRef:
                 name: tazama-shared-secrets
