@@ -1,5 +1,5 @@
 global:
-  tazamaVersion: "latest" # Overrides ${TAZAMA_VERSION} across all deployments [cite: 1, 4]
+  tazamaVersion: "3.0.0" # Overrides ${TAZAMA_VERSION} across all deployments [cite: 1, 4]
   imageRegistry: "docker.io/tazamaorg"
   storageClass: "longhorn-single" # Custom environment configuration from RKE2 deployment profile [cite: 318, 597]
 
