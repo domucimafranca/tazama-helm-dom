@@ -19,6 +19,17 @@ spec:
       labels:
         app: {{ $shortName }}
     spec:
+    # START AFFINITY BLOCK
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: node-role.kubernetes.io/control-plane
+                    operator: DoesNotExist
+                  - key: node-role.kubernetes.io/master
+                    operator: DoesNotExist
+    # END AFFINITY BLOCK
       initContainers:
         - name: wait-db
           image: "postgres:16"
