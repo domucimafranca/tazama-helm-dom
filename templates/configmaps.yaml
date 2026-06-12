@@ -24,4 +24,5 @@ data:
   INTERDICTION_PRODUCER: "interdiction"
   INTERDICTION_DESTINATION: "interdiction"
   ALERT_PRODUCER: "alert"
+  ALERT_DESTINATION: "alert"
   SUPPRESS_ALERTS: "false"
