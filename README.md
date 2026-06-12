@@ -152,3 +152,23 @@ tazama/
     └── rules/                      # Rule-901 and Rule-902 execution pods
         └── rules.yaml (rule-901, rule-902)
 
+## Debugging Notes
+After starting the infrastructure services, the remaining issues had to do with configurations and environment
+variables pertaining to the core services.  Several cycles of editing and running the core service containers
+narrowed down the necessary values.
+
+Additionally, there were issues with node affinity: some services would run on the control plane nodes, resulting
+in unavailable resources.  We resolved this by adding node affinity settings to the spec files.  This may be 
+primarily an issue with the Kubernetes cluster we are testing, so affinity sections are clearly marked for
+easy removal should some streamlining be done in the future
+
+What Was Accomplished:
+- Eradicated the Storage Race Condition: The upgraded health check perfectly synchronized the heavy 00-CREATE.sql catalog, ensuring the relational tables (pacs, pain, etc.) were completely built before any microservice attempted a database call.
+
+- Synchronized the Stream Matrix: Every application layer successfully received its missing environment variables (REDIS_IS_CLUSTER, ALERT_DESTINATION, etc.), allowing the strict @tazama-lf/frms-coe-lib library to validate its routes and boot up without panicking.
+
+- Optimized Node Architecture: Implementing master node exclusion steering kept the database off of the control plane node (k8s-rancher01), protecting etcd and permanently resolving the infrastructure API proxy errors.
+
+- Silenced Telemetry Noise: Turning off the default Elastic APM tracking silenced the constant lookup error spam, giving clean, production-ready system logging.
+
+
