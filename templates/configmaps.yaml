@@ -6,23 +6,22 @@ metadata:
 data:
   NODE_ENV: "dev"
   LOG_LEVEL: "info"
-
-  # Deactivate active APM tracing to stop the ENOTFOUND proxy noise
+  
+  # Telemetry / APM Suppression Flags
   APM_ACTIVE: "false"
   ELASTIC_APM_ACTIVE: "false"
 
-  # Stream Router Configurations
+  # Infrastructure Network Coordinates
   SERVER_URL: "nats:4222"
-  
-  # Cache Tier Configurations
   REDIS_SERVERS: '[{"host":"valkey", "port":6379}]'
   REDIS_IS_CLUSTER: "false"
-
-  # Global Database Host Specifications 
   CONFIGURATION_DATABASE_HOST: "postgres"
   EVENT_HISTORY_DATABASE_HOST: "postgres"
   RAW_HISTORY_DATABASE_HOST: "postgres"
   EVALUATION_DATABASE_HOST: "postgres"
 
-  # Required NATS Stream Routing Keys
+  # NATS Core Stream Message Routing Matrix
   INTERDICTION_PRODUCER: "interdiction"
+  INTERDICTION_DESTINATION: "interdiction"
+  ALERT_PRODUCER: "alert"
+  SUPPRESS_ALERTS: "false"
