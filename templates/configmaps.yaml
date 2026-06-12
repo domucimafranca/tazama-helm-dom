@@ -12,6 +12,7 @@ data:
   
   # Cache Tier Configurations
   REDIS_SERVERS: '[{"host":"valkey", "port":6379}]'
+  REDIS_IS_CLUSTER: "false"
 
   # Global Database Host Specifications 
   CONFIGURATION_DATABASE_HOST: "postgres"
