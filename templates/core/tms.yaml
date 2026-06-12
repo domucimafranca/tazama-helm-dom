@@ -51,6 +51,8 @@ spec:
         - name: tms
           image: "{{ .Values.global.imageRegistry }}/tms-service:{{ .Values.global.tazamaVersion }}"
           env:
+            - name: APM_SERVICE_NAME
+              value: "transaction-monitoring-service"
             - name: FUNCTION_NAME
               value: "transaction-monitoring-service" 
             - name: PORT

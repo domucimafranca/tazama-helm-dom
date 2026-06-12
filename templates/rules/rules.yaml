@@ -40,6 +40,8 @@ spec:
           env:
             - name: STARTUP_TYPE
               value: "nats" 
+            - name: APM_SERVICE_NAME
+              value: {{ $rule | quote }}
             - name: CONFIGURATION_DATABASE
               value: "configuration" 
             - name: RAW_HISTORY_DATABASE

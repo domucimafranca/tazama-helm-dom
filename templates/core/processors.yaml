@@ -59,6 +59,8 @@ spec:
           env:
             - name: STARTUP_TYPE
               value: "nats" 
+            - name: APM_SERVICE_NAME
+              value: {{ $processor | quote }}
             {{- if eq $shortName "ed" }}
             - name: FUNCTION_NAME
               value: "event-director" 

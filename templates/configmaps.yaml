@@ -7,6 +7,10 @@ data:
   NODE_ENV: "dev"
   LOG_LEVEL: "info"
 
+  # Deactivate active APM tracing to stop the ENOTFOUND proxy noise
+  APM_ACTIVE: "false"
+  ELASTIC_APM_ACTIVE: "false"
+
   # Stream Router Configurations
   SERVER_URL: "nats:4222"
   

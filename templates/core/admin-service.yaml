@@ -48,6 +48,8 @@ spec:
         - name: admin-service
           image: "{{ .Values.global.imageRegistry }}/admin-service:{{ .Values.global.tazamaVersion }}"
           env:
+            - name: APM_SERVICE_NAME
+              value: "admin-service"
             - name: FUNCTION_NAME
               value: "admin-service"
             - name: PORT
