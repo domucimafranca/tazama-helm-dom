@@ -1,4 +1,4 @@
-# Tazama Helm Charts
+# Tazama Helm Chart
 
 This repo is an ongoing project to develop a Helm chart for [Tazama](https://github.com/tazama-lf) as an alternative for the [current on-prem Helm](https://github.com/tazama-lf/On-Prem-Helm).  It was rebuilt from scratch using the [Full Stack Docker repo](https://github.com/tazama-lf/Full-Stack-Docker-Tazama) as basis.
 
