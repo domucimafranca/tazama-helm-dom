@@ -20,6 +20,12 @@ data:
   RAW_HISTORY_DATABASE_HOST: "postgres"
   EVALUATION_DATABASE_HOST: "postgres"
 
+  # Database Schema Names (Required for rc version)
+  CONFIGURATION_DATABASE: "configuration"
+  EVENT_HISTORY_DATABASE: "event_history"
+  RAW_HISTORY_DATABASE: "raw_history"
+  EVALUATION_DATABASE: "evaluation"
+
   # NATS Core Stream Message Routing Matrix
   INTERDICTION_PRODUCER: "interdiction"
   INTERDICTION_DESTINATION: "interdiction"
